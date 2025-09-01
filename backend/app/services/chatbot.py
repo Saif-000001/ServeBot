@@ -1,4 +1,5 @@
 import qdrant_client
+from fastapi import HTTPException
 from llama_index.core import VectorStoreIndex, Settings, StorageContext
 from llama_index.core.node_parser import SentenceSplitter
 from llama_index.embeddings.huggingface import HuggingFaceEmbedding
@@ -11,34 +12,41 @@ from llama_index.core.query_engine import RetrieverQueryEngine
 from app.core.config import settings
 from app.utils.documents import load_pdf_documents
 
-# Global variables
-query_engine = None
-index = None
-
-def initialize_chatbot():
-    """Initialize the chatbot components"""
-    global query_engine, index
-    
-    try:
-        print("Initializing chatbot...")
-        
-        # Load documents
-        documents = load_pdf_documents(settings.DATA_DIR)
-        print(f"Loaded {len(documents)} documents")
-
-        # Set up text splitter
-        node_parser = SentenceSplitter(
-            chunk_size=settings.CHUNK_SIZE,
-            chunk_overlap=settings.CHUNK_OVERLAP
+class CustomerServiceChatbot:
+    """
+    CustomerServiceChatbot handles:
+    - Loading documents
+    - Building embeddings
+    - Connecting to Qdrant vector DB
+    - Creating a Retrieval-Augmented Generation (RAG) query pipeline
+    - Serving user queries via a query engine
+    """
+    def __init__(self):
+        """
+        Initialize the chatbot:
+        - Load embeddings model
+        - Setup Qdrant vector database connection
+        - Build RAG chain (Retriever + LLM Synthesizer)
+        """
+        self.index = None
+        self.query_engine = None
+        # Initialize embedding model from HuggingFace
+        self.embeddings = HuggingFaceEmbedding(
+            model_name=settings.EMBEDDING_MODEL
         )
-        Settings.node_parser = node_parser
+        Settings.embed_model = self.embeddings
+        # Connect to Qdrant and build vector store
+        self.setup_qdrant()
+        # Initialize RAG pipeline for question answering
+        self.setup_rag_chain()
 
-        # Set up embeddings
-        Settings.embed_model = HuggingFaceEmbedding(
-            model_name="sentence-transformers/all-MiniLM-L6-v2"
-        )
-
-        # Set up Qdrant vector store
+    def setup_qdrant(self):
+        """
+        Configure the Qdrant vector database:
+        - Connect to Qdrant with or without API key
+        - Create a QdrantVectorStore and attach embeddings
+        - Prepare a StorageContext for LlamaIndex
+        """
         if settings.QDRANT_API_KEY:
             client = qdrant_client.QdrantClient(
                 url=settings.QDRANT_URL,
@@ -46,88 +54,102 @@ def initialize_chatbot():
             )
         else:
             client = qdrant_client.QdrantClient(url=settings.QDRANT_URL)
-
-        vector_store = QdrantVectorStore(
+        # Attach the vector store to the client
+        self.vector_store = QdrantVectorStore(
             client=client,
-            collection_name=settings.COLLECTION_NAME,
+            collection_name=settings.QDRANT_INDEX_NAME,
             dimension=settings.EMBEDDING_DIMENSION
         )
+        # Create storage context for LlamaIndex operations
+        self.storage_context = StorageContext.from_defaults(
+            vector_store=self.vector_store
+        )
 
-        storage_context = StorageContext.from_defaults(vector_store=vector_store)
-
-        # Create or load index
-        print("Creating/loading index...")
-        try:
-            # Try to load existing index
-            index = VectorStoreIndex.from_vector_store(
-                vector_store=vector_store,
-                storage_context=storage_context
-            )
-            print("Loaded existing index from Qdrant")
-        except:
-            # Create new index if loading fails
-            index = VectorStoreIndex.from_documents(
-                documents,
-                storage_context=storage_context,
-                show_progress=True
-            )
-            print("Created new index")
-
-        # Set up LLM
-        if not settings.GOOGLE_API_KEY:
-            raise ValueError("GOOGLE_API_KEY environment variable is not set")
-        
+    def setup_rag_chain(self):
+        """
+        Build the Retrieval-Augmented Generation (RAG) pipeline:
+        - Load or create VectorStoreIndex
+        - Configure retriever
+        - Set up Gemini as LLM
+        - Build response synthesizer
+        - Combine retriever + synthesizer in query engine
+        """
+        # Initialize the LLM (Gemini) for answer generation
         Settings.llm = Gemini(
-            model="models/gemini-1.5-flash",
+            model=settings.CHAT_MODEL,
             api_key=settings.GOOGLE_API_KEY,
-            temperature=0
+            temperature=settings.TEMPERATURE
         )
-
-        # Create retriever
-        retriever = index.as_retriever(similarity_top_k=settings.SIMILARITY_TOP_K)
-
-        # Define system prompt
-        system_prompt_template = (
-            "You are a helpful e-commerce customer service assistant. "
-            "Use the following context to answer customer questions about products, "
-            "orders, account management, and customer service procedures.\n\n"
-            "IMPORTANT GUIDELINES:\n"
-            "- Give direct, specific answers based on the context\n"
-            "- If information isn't in the context, say 'I don't have that specific information. Please contact customer support for assistance.'\n"
-            "- Be concise but complete in your responses\n"
-            "- Use a friendly, professional tone\n\n"
-            "Context information:\n"
-            "---------------------\n"
-            "{context_str}\n"
-            "---------------------\n"
-            "Question: {query_str}\n"
-            "Answer:"
+        try:
+            # Attempt to load an existing index from vector store
+            self.index = VectorStoreIndex.from_vector_store(
+                vector_store=self.vector_store,
+                storage_context=self.storage_context
+            )
+        except Exception as e:
+            # If index not found, notify that a new index must be built
+            raise HTTPException(
+                status_code=500,
+                detail=f"Index not found, build a new index: {str(e)}"
+            )
+        # Convert the index into a retriever for searching similar docs
+        retriever = self.index.as_retriever(
+            similarity_top_k=settings.SIMILARITY_TOP_K
         )
-
-        # Create response synthesizer
+        # Set up response synthesizer with a compact QA template
         response_synthesizer = get_response_synthesizer(
             response_mode="compact",
-            text_qa_template=PromptTemplate(system_prompt_template),
+            text_qa_template=PromptTemplate(settings.PROMPT),
             streaming=False
         )
-
-        # Create query engine
-        query_engine = RetrieverQueryEngine(
+        # Combine retriever and synthesizer in a query engine
+        self.query_engine = RetrieverQueryEngine(
             retriever=retriever,
             response_synthesizer=response_synthesizer,
         )
 
-        print("Chatbot initialization complete!")
-        return True
+    def initialize_vector_store(self, data_path: str = settings.DATA_DIR):
+        """
+        Load documents, chunk them, and populate the vector store:
+        - Load PDF documents from the specified directory
+        - Split text into chunks for better embedding
+        - Insert chunks into VectorStoreIndex (Qdrant)
+        """
+        try:
+            # Load PDF documents from disk
+            documents = load_pdf_documents(data_path)
+            # Configure chunking (size and overlap)
+            node_parser = SentenceSplitter(
+                chunk_size=settings.CHUNK_SIZE,
+                chunk_overlap=settings.CHUNK_OVERLAP
+            )
+            Settings.node_parser = node_parser
+            # Build the index from documents
+            self.index = VectorStoreIndex.from_documents(
+                documents,
+                storage_context=self.storage_context,
+                show_progress=True
+            )
+            return True
+        except Exception as e:
+            # Raise HTTP error if initialization fails
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error initializing vector store: {str(e)}"
+            )
 
-    except Exception as e:
-        print(f"Error initializing chatbot: {str(e)}")
-        return False
-
-def get_query_engine():
-    """Get the global query engine instance"""
-    return query_engine
-
-def get_index():
-    """Get the global index instance"""
-    return index
+    def get_answer(self, question: str):
+        """
+        Query the chatbot and return an answer:
+        - Uses the RAG pipeline (retriever + LLM synthesizer)
+        - Returns the final structured response
+        """
+        try:
+            response = self.query_engine.query(question)
+            return response
+        except Exception as e:
+            # Raise HTTP error if query fails
+            raise HTTPException(
+                status_code=500,
+                detail=f"Error processing question: {str(e)}"
+            )

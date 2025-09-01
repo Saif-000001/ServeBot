@@ -1,34 +1,36 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
+
 from app.api.routes import router
-from app.services.chatbot import initialize_chatbot
+from app.services.chatbot import CustomerServiceChatbot
+from app.models.chat import HealthResponse
+from app.core.config import settings
 
-# FastAPI app initialization
+# Initialize FastAPI app with metadata
 app = FastAPI(
-    title="Customer Service Chatbot API",
-    description="AI-powered customer service chatbot using RAG",
-    version="1.0.0"
+    title=settings.PROJECT_NAME,
+    description=settings.DESCRIPTION,
+    version=settings.VERSION
 )
-
-# CORS middleware
+# Apply CORS middleware (Cross-Origin Resource Sharing)
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://localhost:5173"],
-    allow_credentials=True,
-    allow_methods=["*"],
-    allow_headers=["*"],
+    allow_origins=settings.ALLOWED_ORIGINS,  
+    allow_credentials=True,  
+    allow_methods=["*"],     
+    allow_headers=["*"],     
 )
-
-# Include API routes
+# Include all API routes from the router
 app.include_router(router)
 
-# Initialize chatbot on startup
-@app.on_event("startup")
-async def startup_event():
-    success = initialize_chatbot()
-    if not success:
-        print("Failed to initialize chatbot. Some endpoints may not work.")
+# Startup event: Initialize chatbot once when server starts
+@apt.get("/", response_model=HealthResponse)
+async def root():
+    """
+    Useful for monitoring or checking server status.
+    """
+    return HealthResponse(
+        status="healthy",
+        message="Customer Service Chatbot API is running"
+    )
 
-if __name__ == "__main__":
-    import uvicorn
-    uvicorn.run(app, host="0.0.0.0", port=8000, reload=True)
