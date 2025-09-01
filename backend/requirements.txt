@@ -1,0 +1,11 @@
+llama-index==0.12.15
+qdrant-client==1.15.1
+pathlib==1.0.1
+fastapi==0.115.6
+uvicorn[standard]==0.32.1
+pydantic==2.10.6
+pydantic-settings==2.7.1
+python-dotenv==1.1.0
+pypdf==5.1.0
+sentence-transformers==3.4.1
+-e .
