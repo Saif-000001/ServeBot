@@ -9,7 +9,7 @@ from app.core.config import settings
 # Initialize FastAPI app with metadata
 app = FastAPI(
     title=settings.PROJECT_NAME,
-    description=settings.DESCRIPTION,
+    description=settings.DESCREPTION,
     version=settings.VERSION
 )
 # Apply CORS middleware (Cross-Origin Resource Sharing)
@@ -24,7 +24,7 @@ app.add_middleware(
 app.include_router(router)
 
 # Startup event: Initialize chatbot once when server starts
-@apt.get("/", response_model=HealthResponse)
+@app.get("/", response_model=HealthResponse)
 async def root():
     """
     Useful for monitoring or checking server status.
