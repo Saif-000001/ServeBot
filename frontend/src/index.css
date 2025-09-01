@@ -1,0 +1,19 @@
+/* Tailwind CSS Entry File */
+/* 
+ * @tailwind base;
+ * ----------------
+ * Injects Tailwind's base styles (e.g., resets, typography defaults)
+ */
+@tailwind base;
+/* 
+ * @tailwind components;
+ * ---------------------
+ * Injects Tailwind's component classes (predefined reusable components)
+ */
+@tailwind components;
+/* 
+ * @tailwind utilities;
+ * ---------------------
+ * Injects Tailwind's utility classes (e.g., margin, padding, flex, colors)
+ */
+@tailwind utilities;
