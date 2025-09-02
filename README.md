@@ -161,6 +161,9 @@ cd ServeBot
 ### 2. Backend Setup
 
 ```bash
+# Navigate to backend directory
+cd backend
+ 
 # Create virtual environment
 python -m venv .venv
 
@@ -305,9 +308,9 @@ python -m uvicorn app.main:app --reload --host 0.0.0.0 --port 8000
 ```bash
 # From frontend directory
 cd frontend
-npm ServeBot
+npm run ServeBot
 # or
-yarn ServeBot
+yarn run ServeBot
 ```
 ##### Live UI: https://servebot.netlify.app/
 
