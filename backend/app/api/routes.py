@@ -15,6 +15,7 @@ async def chat(message: ChatMessage):
     # Get the chatbot's response for the given message
     response = chatbot.get_answer(message.message)
     # Return the response wrapped in the ChatResponse model
+    print("DEBUG chatbot response:", response, type(response))
     return ChatResponse(
         response=str(response)
     )

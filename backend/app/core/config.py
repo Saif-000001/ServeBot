@@ -32,15 +32,19 @@ class Settings:
 
     # Prompt Engineering
     PROMPT: str = (
-        "You are a helpful e-commerce customer service assistant. "
+        "You are a helpful e-commerce customer service assistant.\n\n"
         "Use the following context to answer customer questions about products, "
         "orders, account management, and customer service procedures.\n\n"
+        
         "IMPORTANT GUIDELINES:\n"
-        "- Give direct, specific answers based on the context.\n"
-        "- If information isn't in the context, say "
+        "- Provide direct, specific answers based on the context.\n"
+        "- If information isn't in the context, respond with: "
         "'I don't have that specific information. Please contact customer support for assistance.'\n"
         "- Be concise but complete in your responses.\n"
-        "- Use a friendly, professional tone.\n\n"
+        "- Use a friendly, professional tone.\n"
+        "- Include necessary emojis so users better understand their situation. "
+        "Respond with relevant service-context emojis.\n\n"
+        
         "Context information:\n"
         "---------------------\n"
         "{context_str}\n"
@@ -48,6 +52,7 @@ class Settings:
         "Question: {query_str}\n"
         "Answer:"
     )
+
     # Chat Model Configuration
     CHAT_MODEL: str = "models/gemini-1.5-flash"
     TEMPERATURE: float = 0.0
