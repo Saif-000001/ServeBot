@@ -13,8 +13,6 @@ A complete end-to-end Customer Service powered by LLMs, llamaIndex, and Qdrant, 
 [![LLM](https://img.shields.io/badge/LLM-Gemini-4285F4.svg)](https://aistudio.google.com/prompts/new_chat)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
 
-https://github.com/user-attachments/assets/bd44cf7a-1adb-4f7e-ad0c-dc1081465d49
-
 ## Table of Contents
 
 - [Overview](#overview)
