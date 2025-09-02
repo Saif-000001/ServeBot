@@ -311,7 +311,7 @@ npm ServeBot
 # or
 yarn ServeBot
 ```
-##### Live UI: https://medicalchatbotapp.netlify.app/
+##### Live UI: https://servebot.netlify.app/
 
 #### Initialize Vector Database
 
