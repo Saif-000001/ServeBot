@@ -1,7 +1,7 @@
 services:
   frontend:
     image: frontend # frontend image name
-    container_name: medical_chatbot-frontend
+    container_name: customer_chatbot-frontend
     ports:
       - "3000:3000" # Host port 3000 → container port 3000
     depends_on:
@@ -11,7 +11,7 @@ services:
 
   backend:
     image: backend # backend image name
-    container_name: medical_chatbot-backend
+    container_name: customer_chatbot-backend
     ports:
       - "8000:8000" # Host port 8000 → container port 8000
     environment:

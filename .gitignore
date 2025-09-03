@@ -209,7 +209,7 @@ __marimo__/
 
 # Build / packaging
 setup.py
-medical_chatbot.egg-info/
+customer_chatbot.egg-info/
 data/
 
 # Shell scripts

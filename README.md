@@ -12,6 +12,7 @@ A complete end-to-end Customer Service powered by LLMs, llamaIndex, and Qdrant, 
 [![Vector%20Store](https://img.shields.io/badge/Vector%20Store-Qdrant-00A78E.svg)](https://qdrant.tech/)
 [![LLM](https://img.shields.io/badge/LLM-Gemini-4285F4.svg)](https://aistudio.google.com/prompts/new_chat)
 [![License](https://img.shields.io/badge/license-MIT-green.svg)](LICENSE)
+https://github.com/user-attachments/assets/93e8627b-b3a4-44c9-a242-66bf85211930
 
 ## Table of Contents
 
@@ -33,7 +34,7 @@ A complete end-to-end Customer Service powered by LLMs, llamaIndex, and Qdrant, 
 The Customer Service Chatbot is an intelligent conversational AI system designed to provide service-related information and answer customer queries. Built with state-of-the-art technologies, including Large Language Models (LLMs), vector databases, and modern web frameworks, it delivers accurate, contextual responses based on customer support documents.
 
 ### Key Capabilities
-- **Intelligent Document Search**: Uses RAG (Retrieval-Augmented Generation) to find relevant medical information
+- **Intelligent Document Search**: Uses RAG (Retrieval-Augmented Generation) to find relevant Customer information
 - **Natural Conversations**: Powered by Google's Gemini LLM for human-like interactions
 - **Real-time Responses**: Fast, efficient processing with modern async architecture
 - **Professional UI**: Clean, responsive interface optimized for healthcare use cases
@@ -191,7 +192,7 @@ yarn install
 ### Project Structure
 
 ```
-medical_chatbot/
+Customer_chatbot/
 ├── backend/
 │   ├── app/
 │   │   ├── api/            # API routes
@@ -234,7 +235,7 @@ medical_chatbot/
 │   │   │   ├── useScroll.js        # Auto-scrolls chat window to bottom
 │   │   │   └── useFormatTime.js    # Formats timestamps for messages
 │   │   ├── pages/
-│   │   │   └── MedicalChatbot.jsx  # Main chatbot page (UI + logic)
+│   │   │   └── CustomerChatbot.jsx  # Main chatbot page (UI + logic)
 │   │   ├── main.jsx                # ReactDOM entry point
 │   │   └── index.css               # include tawilwind library 
 │   ├── .env                        # Environment variables (API URL, etc.)
