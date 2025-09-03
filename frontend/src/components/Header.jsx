@@ -5,8 +5,8 @@ import img from "../assets/img.png";
  * - Displays a header bar for the chatbot interface
  * - Includes:
  *    • Bot avatar (circular image with white border)
- *    • Title: "Medical Assistant"
- *    • Subtitle/description: "AI-powered medical information assistant"
+ *    • Title: "Customer Assistant"
+ *    • Subtitle/description: "AI-powered customer information assistant"
  * - Uses gradient background and shadow for a modern look
  */
 const Header = () => (

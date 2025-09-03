@@ -15,4 +15,4 @@ COPY . .
 EXPOSE 3000
 
 # Default command to start the app
-CMD ["npm", "run", "medical_chatbot"]
+CMD ["npm", "run", "ServeBot"]

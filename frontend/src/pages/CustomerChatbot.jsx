@@ -8,9 +8,9 @@ import { useEmoji } from '../hooks/useEmoji';
 import { useScroll } from '../hooks/useScroll';
 import { useFormatTime } from '../hooks/useFormatTime';
 /**
- * MedicalChatbot Component
+ * Customer Chatbot Component
  * ------------------------
- * Main chat interface for the AI-powered medical assistant.
+ * Main chat interface for the AI-powered customer assistant.
  * Features:
  *  - Header with bot avatar and title
  *  - Scrollable chat messages (user & bot)
@@ -18,7 +18,7 @@ import { useFormatTime } from '../hooks/useFormatTime';
  *  - Message input with send button
  *  - Error handling and bot typing animation
  */
-const MedicalChatbot = () => {
+const CustomerChatbot = () => {
   // Custom hook to manage chat state and API interactions
   const { messages, isLoading, error, inputMessage, setInputMessage, sendMessage, handleKeyPress } = useChat();
   // Custom hook to manage emoji picker state
@@ -96,4 +96,4 @@ const MedicalChatbot = () => {
     </div>
   );
 };
-export default MedicalChatbot;
+export default CustomerChatbot;

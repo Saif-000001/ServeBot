@@ -39,7 +39,7 @@ const MessageInput = ({
           value={inputMessage} // Controlled input value
           onChange={(e) => setInputMessage(e.target.value)} // Update value on change
           onKeyPress={handleKeyPress} // Handle Enter key
-          placeholder="Ask Medical Chatbot…"
+          placeholder="Ask Customer Chatbot…"
           className="w-full px-4 py-2 pr-12 text-black bg-transparent focus:outline-none resize-none"
           rows={1}
           style={{ minHeight: "40px", maxHeight: "100px" }} // Dynamic height limits
