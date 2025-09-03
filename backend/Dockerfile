@@ -1,6 +1,5 @@
 # Backend Dockerfile 
 
-
 # Use official Python 3.12 Bullseye image (includes basic build tools)
 FROM python:3.12-bullseye
 
