@@ -14,8 +14,8 @@ async def chat(message: ChatMessage):
         raise HTTPException(status_code=400, detail="Message cannot be empty")
     # Get the chatbot's response for the given message
     response = chatbot.get_answer(message.message)
+    # print("DEBUG chatbot response:", response, type(response))
     # Return the response wrapped in the ChatResponse model
-    print("DEBUG chatbot response:", response, type(response))
     return ChatResponse(
         response=str(response)
     )
